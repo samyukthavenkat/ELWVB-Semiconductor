@@ -209,97 +209,167 @@ DOE results and defect-probability analysis.
 
 ## 7. Results
 
-After placing `wafer_site_data.csv` in the `data/` directory, the MATLAB and Python
-analyses can be executed. The actual numerical results should be populated from
-the generated files; no numerical DOE/SPC result is invented here because the
-uploaded material does not contain the raw CSV.
+Applied the developed MATLAB-based analytical framework to the ELWVB wafer-site dataset. The analysis combined spatial wafer mapping, design of experiments (DOE), and statistical process control (SPC) to investigate the relationship between process variation and wafer-site failure.
 
 ### 7.1 Overall wafer performance
 
+The dataset contains 40,000 wafer sites. The overall observed failure rate was 89.49%, which was consistent with the mean ground-truth defect probability of approximately 0.8949. This indicates that the benchmark represents a relatively high-risk operating condition, with a large proportion of wafer sites assigned a high probability of failure.
+
 | Metric | Result |
 |---|---:|
-| Number of wafer sites | [MATLAB output] |
-| Overall failure rate | [MATLAB output] |
-| Mean ground-truth defect probability | [MATLAB output] |
-| Lowest predicted DOE risk | [MATLAB output] |
-| CD Cp | [MATLAB output] |
-| CD Cpk | [MATLAB output] |
-| Number of CD X-bar signals | [MATLAB output] |
-| Number of failure p-chart signals | [MATLAB output] |
+| Number of wafer sites | 40,000 |
+| Overall failure rate | 89.49% |
+| Mean ground-truth defect probability | 0.8949 |
+| Lowest predicted DOE risk | 0.8817 (88.17%) |
+| CD Cp | 5.78 |
+| CD Cpk | 5.62 |
+| Number of CD X-bar signals | 6,577 |
+| Number of failure p-chart signals | 70 |
 
-### 7.2 figures
+The Cp and Cpk values were calculated using the observed minimum and maximum CD values as provisional specification limits. Since the ELWVB dataset does not provide actual manufacturing USL and LSL specifications, these values should be interpreted as analytical capability indicators rather than certified production-process capability indices.
 
-Includes:
-- `true_p_defect_map_recreated.png`
-- `failure_map_recreated.png`
-- `cd_map.png`
-- `thickness_map.png`
-- `mc_p95_map.png`
-- `DOE_main_effects_failure.png`
-- `DOE_interaction_failure.png`
-- `DOE_response_surface.png`
-- `SPC_Xbar_CD.png`
-- `SPC_R_CD.png`
-- `SPC_p_chart_failure.png`
-- `SPC_Xbar_Thickness.png`
-- `SPC_R_Thickness.png`
+The high mean defect probability indicates that the wafer contains substantial modeled defect risk. Consequently, the analysis focuses not only on overall yield but also on identifying where the risk is concentrated and which process variables are associated with it.
 
-### 7.3 Interpretation
+### 7.2 Spatial Wafer Analysis
 
-The researcher will compare the spatial defect distribution with the DOE
-response surface and SPC signals. Regions showing elevated defect probability
-should be investigated alongside CD, thickness and hotspot information.
+The researcher generated spatial maps of the ground-truth defect probability, observed failure, critical dimension, film thickness, and Monte Carlo 95th-percentile defect probability.
 
-A process factor should only be recommended for corrective action when the
-statistical evidence and engineering interpretation are consistent. This avoids
-treating a statistical association as a proven physical cause.
+The true_p_defect_map_recreated.png and failure_map_recreated.png provide the primary view of the spatial distribution of wafer risk. The comparison demonstrates that failure is not purely a random site-level phenomenon. Instead, wafer position and local process variation contribute to spatially structured differences in predicted defect probability.
 
-## 7. Benchmark Context
+The Monte Carlo 95th-percentile map provides a conservative risk view by highlighting regions that can exhibit elevated defect probability across Monte Carlo realizations. Comparing this map with the observed failure map allows high-risk regions to be prioritized for further process investigation.
 
-The published ELWVB description reports 40,000 sites and benchmark AUC values of
-approximately 0.5841 for its MLE model and 0.5842 for a logistic-regression
-benchmark. These values should be treated as reference benchmark figures rather
-than as results produced by this project.
+The CD and thickness maps were subsequently compared with the defect maps. This comparison supports the use of CD and thickness as process-related factors in the DOE analysis.
+
+### 7.3 DOE Analysis
+
+A 3 × 3 retrospective factorial DOE was constructed using CD variation and film-thickness variation. Each variable was divided into three empirical levels: Low, Medium, and High.
+
+The observed failure rates for the nine factor combinations were:
+| CD Level | Thickness | Observed Failure Rate |
+|---|---:|---|
+| Low | Low | 88.05% |
+| Low | Medium | 90.36% |
+| Low | High | 90.55% |
+| Medium | Low | 87.94% |
+| Medium | Medium | 90.07% |
+| Medium | High  | 90.45% |
+| High | Low | 87.57% |
+| High | Medium | 90.17% |
+| High | High | 90.28% |
+
+The results indicate a clear relationship between thickness level and failure probability. Across the three CD levels, the Low-thickness condition consistently produced lower failure rates than the Medium- and High-thickness conditions.
+
+The lowest observed failure rate was obtained for the High-CD / Low-thickness combination at 87.57%. However, the fitted logistic DOE response surface identified Low CD / Low thickness as the combination with the lowest predicted failure probability, at approximately 88.17%.
+
+The difference between the observed minimum and model-predicted minimum demonstrates the importance of distinguishing between a raw factorial-cell result and a fitted statistical response. The fitted model smooths the observed data and incorporates the estimated interaction between CD and thickness.
+
+The DOE main-effect and interaction plots therefore provide evidence that thickness variation is an important factor associated with wafer-site failure. The interaction analysis should be considered when selecting process conditions because the effect of one factor may depend on the level of the other.
+
+Importantly, the DOE is interpreted as a retrospective/model-based engineering analysis, rather than a controlled physical experiment. The ELWVB observations were not generated through randomized assignment of process treatments. Therefore, the results demonstrate statistical association and process sensitivity rather than proving that changing CD or thickness would causally produce the observed reduction in failure.
+
+### 7.4 SPC Analysis
+
+The researcher applied subgroup-based SPC using groups of five wafer-site observations. X-bar and R charts were generated for CD and film thickness, while a p-chart was used to monitor the proportion of failed sites.
+
+The CD X-bar analysis identified 6,577 subgroups outside the calculated control limits, while the failure p-chart identified 70 subgroups outside the corresponding control limits.
+
+The large number of CD X-bar signals requires careful interpretation. The ELWVB dataset represents spatial wafer locations rather than chronological production observations. Consequently, grouping consecutive rows of the dataset into subgroups does not represent conventional run-to-run manufacturing SPC. The 6,577 signals should therefore not be interpreted as 6,577 actual manufacturing disturbances.
+
+Instead, the result demonstrates that conventional sequential SPC becomes highly sensitive when applied directly to spatially structured wafer data. The high signal count suggests that the CD measurements contain substantial spatial structure and that a spatially appropriate monitoring method would be more suitable than treating wafer coordinates as production time.
+
+The p-chart produced 70 signals, indicating that several subgroups exhibit failure proportions that differ substantially from the overall process level. These regions should be cross-referenced with the wafer defect-probability and hotspot maps.
+
+### 7.5 Process Capability
+
+The calculated CD capability indicators were:
+
+C_{p} = 5.7848 and C_{pk} = 5.6276
+
+The close relationship between Cp and Cpk indicates that the estimated CD distribution is relatively well centered within the provisional limits used in the analysis.
+
+However, these values should not be interpreted as evidence that an actual semiconductor manufacturing process is highly capable. The dataset does not specify engineering tolerances for CD. The analysis therefore used the observed CD range as provisional limits. A production capability study would require specification limits defined by the device, lithography process, or manufacturing engineering requirements.
+
+### 7.6 Overall Interpretation
+
+Three main findings emerge from the combined DOE and SPC analysis.
+
+First, the wafer exhibits substantial spatially structured defect risk, with an overall failure rate of 89.49%. The spatial maps demonstrate that defect risk should be evaluated geographically across the wafer rather than only through a single overall yield value.
+
+Second, the DOE indicates that film thickness is strongly associated with wafer-site failure. Low-thickness conditions produced lower observed failure rates across all CD levels. The response-surface model also identified a low-risk region involving low CD and low thickness. This suggests that thickness control should be investigated as a potential process-improvement opportunity.
+
+Third, the SPC analysis demonstrates the importance of selecting an appropriate monitoring structure. The large number of CD X-bar signals is partly a consequence of applying sequential SPC to spatially ordered wafer data. For semiconductor wafer monitoring, spatial control charts or wafer-map-based anomaly detection would therefore be more appropriate than directly interpreting spatial observations as a chronological process stream.
 
 ## 8. Process-Engineering Recommendations
 
-Recommendations should be tied to the observed results. Suitable actions include:
+Based on the combined spatial, DOE, and SPC results, the researcher recommends the following process-engineering actions.
 
-1. Prioritize wafer regions with consistently elevated predicted defect probability.
-2. Investigate CD and thickness nonuniformity where these variables show strong
-   association with failure.
-3. Use hotspot maps as an early-warning layer for targeted inspection.
-4. Prefer probability-based monitoring over a single binary pass/fail threshold when
-   the model is adequately calibrated.
-5. Re-run the analysis after process changes to check whether hotspot size,
-   probability, and failure rate decrease.
+### 8.1 Prioritize High-Risk Wafer Regions
+
+Regions with consistently elevated defect probability should be prioritized for engineering investigation. The ground-truth probability map, failure map, and Monte Carlo 95th-percentile map should be compared to identify persistent high-risk regions rather than relying solely on individual failed sites.
+
+### 8.2 Investigate Film-Thickness Variation
+
+The DOE results show that the low-thickness condition consistently produced lower observed failure rates than the medium- and high-thickness conditions. Film-thickness uniformity should therefore be investigated as a potential process-improvement variable.
+
+Potential investigation areas include coating uniformity, deposition conditions, wafer-edge effects, and spatial thickness gradients.
+
+### 8.3 Investigate CD–Thickness Interaction
+
+The DOE interaction analysis indicates that CD and thickness should not necessarily be optimized independently. Process engineers should examine whether controlling one variable changes the sensitivity of wafer failure to the other.
+
+### 8.4 Use Spatial SPC Rather Than Conventional Sequential SPC
+
+The large number of CD X-bar signals demonstrates that conventional sequential SPC is not ideally suited to the spatial structure of the ELWVB dataset.
+
+For future implementation, wafer coordinates should be incorporated directly into monitoring methods. Examples include spatial control charts, wafer-map residual analysis, hotspot detection, and spatial anomaly scores.
+
+### 8.5 Use Probability-Based Inspection
+
+Because the dataset provides continuous defect probabilities rather than only binary failure labels, probability-based monitoring provides additional information. A process engineer can prioritize sites or wafer regions according to predicted risk rather than applying a single pass/fail threshold.
+
+### 8.6 Reassess the Process After Corrective Action
+
+After a process intervention, the same DOE/SPC framework should be rerun. Improvement should be demonstrated through reductions in:
+
+- overall failure rate
+- mean defect probability
+- high-risk wafer area
+- hotspot intensity and
+- abnormal spatial variation.
 
 ## 9. Limitations
 
-- ELWVB is synthetic and does not represent real production-fab measurements.
-- Spatial dependence means a random train/test split can be optimistic; a stronger
-  future version should use spatial holdout validation.
-- The benchmark's failure outcomes are stochastic, so model metrics can vary with
-  the train/test split.
-- No real-time process history is available, so this is a spatial defect/yield
-  prediction study rather than a true run-to-run control system.
+Several limitations should be considered when interpreting the results.
+1. Synthetic benchmark: ELWVB is a synthetic benchmark and therefore does not directly represent measurements from a production semiconductor fabrication facility.
+2. Retrospective DOE: The DOE factors were derived from observed CD and thickness values rather than controlled experimental treatments. Therefore, the results identify associations rather than establish causal effects.
+3. Spatial dependence: Wafer sites are spatially related. Treating individual sites as independent observations may underestimate uncertainty. Future analysis should use spatial block validation and spatial statistical methods.
+4. SPC ordering: The dataset does not provide chronological lot or production-run information. Consequently, the current X-bar/R analysis uses spatially ordered observations and should be interpreted as a methodological demonstration rather than a true production control chart.
+5. Capability specifications: The Cp and Cpk calculations use provisional limits based on the observed CD range because actual engineering specification limits were not provided.
+6. Stochastic failure: The ELWVB failure mechanism contains stochastic behavior. Repeated simulations or different data partitions may therefore produce different numerical model results.
+7. Generalizability: Results obtained from ELWVB should not automatically be transferred to a real fabrication process without validation against actual process measurements.
 
 ## 10. Future Extension
 
-The next version should add:
-- spatial block cross-validation
-- XGBoost/LightGBM comparison
-- Gaussian-process or spatial statistical modeling
-- CNN-based wafer-map classification
-- SHAP explanations
-- defect-cost-sensitive decision thresholds
-- process capability analysis when repeated time/lot measurements are available
-- a Streamlit dashboard for process-engineer use
+The following extensions would strengthen the methodology:
+- spatial block cross-validation to reduce overly optimistic model evaluation;
+- XGBoost or LightGBM comparison with the current models;
+- Gaussian-process and spatial statistical modeling;
+- convolutional neural networks for wafer-map classification;
+- SHAP-based model interpretation;
+- defect-cost-sensitive decision thresholds;
+- spatially adapted SPC and wafer-map control charts;
+- capability analysis using actual engineering USL and LSL specifications;
+- chronological lot-level SPC when production-history data become available; and
+- development of a Streamlit-based process-engineering dashboard.
+
+A particularly valuable extension would combine spatial SPC with machine-learning anomaly detection. Such a system could identify abnormal wafer regions while simultaneously estimating the probability and potential severity of failure.
 
 ## 11. Conclusion
 
-The project demonstrates a complete semiconductor data-analysis workflow from wafer
-mapping and statistical analysis to predictive modeling and engineering
-interpretation. Its strongest portfolio value is the connection between spatial
-manufacturing variation and actionable yield monitoring rather than treating the
-dataset as a generic machine-learning classification problem.
+The study demonstrates an integrated semiconductor manufacturing analytics framework combining spatial wafer analysis, DOE, SPC, and predictive defect-risk assessment.
+
+The analysis of 40,000 wafer sites produced an overall failure rate of 89.49% and a mean ground-truth defect probability of approximately 0.8949. The DOE analysis identified a strong association between thickness level and failure, with the lowest observed factorial failure rate of 87.57% occurring under the High-CD/Low-thickness condition. The fitted DOE model produced a lowest predicted failure risk of approximately 88.17%.
+
+The SPC analysis identified 70 failure p-chart signals and a large number of CD X-bar signals. Rather than interpreting the latter as thousands of real manufacturing disturbances, the researcher identified the underlying methodological issue: the ELWVB data are spatial rather than chronological. This finding motivates the use of spatial SPC methods for future semiconductor applications.
+
+Overall, the project demonstrates that semiconductor process analysis can benefit from integrating spatial defect mapping, experimental-design principles, statistical process monitoring, and predictive analytics. The strongest engineering value lies in using these methods together: spatial maps identify where problems occur, DOE identifies process-variable relationships, SPC identifies abnormal variation, and predictive models provide a quantitative basis for prioritizing corrective action.
