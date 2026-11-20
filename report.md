@@ -283,7 +283,13 @@ The p-chart produced 70 signals, indicating that several subgroups exhibit failu
 
 The calculated CD capability indicators were:
 
-C_{p} = 5.7848 and C_{pk} = 5.6276
+$$
+C_p = 5.7848
+$$
+
+$$
+C_{pk} = 5.6276
+$$
 
 The close relationship between Cp and Cpk indicates that the estimated CD distribution is relatively well centered within the provisional limits used in the analysis.
 
