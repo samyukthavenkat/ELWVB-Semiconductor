@@ -1,10 +1,9 @@
 # ELWVB Semiconductor Wafer Defect Prediction Project
 
-## Project title
 **Spatial Defect Prediction and Yield Optimization in Semiconductor Wafer Manufacturing Using the Energy-Landscape Wafer Variation Benchmark (ELWVB)**
 
 ## Purpose
-This is a portfolio-ready semiconductor process/data-engineering project using the
+This is a semiconductor process/data-engineering project using the
 ELWVB synthetic wafer benchmark. The dataset represents 40,000 sites on a 200 x 200
 wafer grid and provides spatial/process variables, ground-truth defect probability,
 binary failure outcomes, and Monte Carlo/MLE probability estimates.
@@ -70,17 +69,6 @@ The project treats CD and film thickness as process-related variables and spatia
 location as an important source of variation. The analysis asks where defects
 concentrate, which process variables are associated with risk, and whether the
 predicted probability is reliable enough to support yield monitoring.
-
-## Portfolio framing
-A strong final presentation should emphasize:
-**process variation -> spatial defect risk -> statistical evidence -> prediction ->
-engineering action**
-
-## Suggested final CV bullet
-Built a spatial semiconductor wafer defect-prediction framework using the 40,000-site
-ELWVB benchmark, combining wafer-map analytics, statistical yield analysis, leakage-aware
-machine learning, probability calibration, and feature-importance analysis to identify
-defect-prone regions and process variables.
 
 ## Data attribution
 The ELWVB documentation identifies the benchmark as the Energy-Landscape Wafer
