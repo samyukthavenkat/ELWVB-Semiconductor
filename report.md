@@ -227,9 +227,9 @@ uploaded material does not contain the raw CSV.
 | Number of CD X-bar signals | [MATLAB output] |
 | Number of failure p-chart signals | [MATLAB output] |
 
-### 7.2 Required figures
+### 7.2 figures
 
-The final report should include:
+Includes:
 - `true_p_defect_map_recreated.png`
 - `failure_map_recreated.png`
 - `cd_map.png`
